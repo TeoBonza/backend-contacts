@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  # creationTimestamp: null
+  name: express-project-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5001
+  selector:
+    app: express-project
+  type: LoadBalancer
+status:
+  loadBalancer: {}
