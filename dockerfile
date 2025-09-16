@@ -19,8 +19,7 @@ COPY . .
 
 RUN mkdir -p /data
 
-EXPOSE 5001
-EXPOSE 6379
+EXPOSE $PORT
 
 COPY start.sh ./
 RUN chmod +x start.sh
