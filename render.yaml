@@ -1,0 +1,18 @@
+
+services:
+  - type: web
+    name: nodejs-redis-app
+    runtime: docker
+    plan: starter
+    region: oregon
+    buildCommand: docker build -t nodejs-redis-app .
+    startCommand: ./start.sh
+    envVars:
+      - key: PORT
+        value: 5001
+      - key: REDIS_URL
+        value: redis://localhost:6379
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /
+    autoDeploy: true
