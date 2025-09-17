@@ -1,15 +1,14 @@
-const Redis = require("ioredis");
+const Redis = require('ioredis');
 
-const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
-
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 const redisClient = new Redis(redisUrl);
 
-redisClient.on("connect", () => {
-  console.log("✅ Connected to Redis:", redisUrl);
+redisClient.on('connect', () => {
+  console.log('✅ Connected to Redis:', redisUrl);
 });
 
-redisClient.on("error", (err) => {
-  console.error("❌ Redis error:", err);
+redisClient.on('error', (err) => {
+  console.error('❌ Redis error:', err);
 });
 
 const rateLimiter = ({ windowInSeconds, maxRequests }) => {
@@ -18,21 +17,21 @@ const rateLimiter = ({ windowInSeconds, maxRequests }) => {
       const ip = req.ip;
       const key = `rate-limit:${ip}:${req.originalUrl}`;
 
-      const requests = await client.incr(key);
+      const requests = await redisClient.incr(key);
 
       if (requests === 1) {
-        await client.expire(key, windowInSeconds);
+        await redisClient.expire(key, windowInSeconds);
       }
 
       if (requests > maxRequests) {
         return res.status(429).json({
-          message: "Too many requests. Please try again later.",
+          message: 'Too many requests. Please try again later.',
         });
       }
 
       next();
     } catch (err) {
-      console.error("Rate limiter error:", err);
+      console.error('Rate limiter error:', err);
       next();
     }
   };
