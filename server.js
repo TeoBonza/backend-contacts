@@ -16,7 +16,7 @@ app.use(express.json());
 // Applying rate limits
 app.use('/api/users/login', rateLimiter({ windowInSeconds: 60, maxRequests: 5 }));
 app.use('/api/users/register', rateLimiter({ windowInSeconds: 60, maxRequests: 5 }));
-app.use(rateLimiter({ windowInSeconds: 60, maxRequests: 100 }));
+app.use(rateLimiter({ windowInSeconds: 60, maxRequests: 10 }));
 
 app.use('/api/contacts', require('./routes/contactRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
