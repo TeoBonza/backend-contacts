@@ -11,14 +11,14 @@ services:
       - redis
 
   redis:
-    build:
-      context: .
-      dockerfile: dockerfile.redis
+    image: redis:latest
     restart: always
     volumes:
       - redis_volume_data:/data
     ports:
       - "6379:6379"
+    expose:
+      - "6379"
 
 volumes:
   redis_volume_data:
