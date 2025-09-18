@@ -1,10 +1,10 @@
 const Redis = require('ioredis');
 
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+const redisUrl = process.env.REDIS_CLOUD_URL || process.env.REDIS_URL || 'redis://localhost:6379';
 const redisClient = new Redis(redisUrl);
 
 redisClient.on('connect', () => {
-  console.log('✅ Connected to Redis:', redisUrl);
+  console.log('✅ Connected to Redis:', redisUrl.replace(/:[^:]*@/, ':****@'));
 });
 
 redisClient.on('error', (err) => {
