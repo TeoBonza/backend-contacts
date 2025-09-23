@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
+const AppDataSource = require('../dataSource');
 
 //@desc Register a user
 //@route POST /api/users/register
@@ -15,7 +16,8 @@ const registerUser = asyncHandler(async (req, res) => {
   };
 
   // Check if user already exists
-  const userExists = await User.findOne({ email });
+  const userRepository = AppDataSource.getMongoRepository(User);
+  const userExists = await userRepository.findOne({ email });
   if (userExists) {
     res.status(400);
     throw new Error('User already registered');
@@ -23,13 +25,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
   //Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
-  console.log("Hashed Password: ", hashedPassword);
 
-  const user = await User.create({
+  const newUser = userRepository.create({
     username,
     email,
     password: hashedPassword,
   });
+
+  const user = await userRepository.save(newUser);
 
   if (user) {
     res.status(201).json({ _id: user.id, email: user.email });
@@ -51,7 +54,9 @@ const loginUser = asyncHandler(async (req, res) => {
   };
 
   // Check if user exists
-  const user = await User.findOne({ email });
+  const userRepository = AppDataSource.getMongoRepository(User);
+  const user = await userRepository.findOneBy({ email });
+
   if (!user) {
     res.status(400);
     throw new Error('User not found');
@@ -60,12 +65,12 @@ const loginUser = asyncHandler(async (req, res) => {
   // Compare password with hashed password
   const isMatch = await bcrypt.compare(password, user.password);
   if (isMatch) {
-    const accessToken = jwt.sign({ 
+    const accessToken = jwt.sign({
       user: {
         username: user.username,
         email: user.email,
-        id: user._id
-      }, 
+        id: user.id.toString(),
+      },
     }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '15m',
     });

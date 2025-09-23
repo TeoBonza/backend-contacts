@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { EntitySchema } = require('typeorm');
 
 /**
  * @swagger
@@ -23,31 +23,43 @@ const mongoose = require('mongoose');
  *       example:
  *         name: John Doe
  *         email: john@example.com
- *         phone: "+1-202-555-0152"
+ *         phone: '+1-202-555-0152'
  */
 
-const contactSchema = mongoose.Schema({
-  user_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "User",
+module.exports = new EntitySchema({
+  name: 'Contact',
+  tableName: 'contacts',
+  columns: {
+    _id: {
+      primary: true,
+      type: 'objectId',
+      objectId: true,
+      generated: true,
+    },
+    user_id: {
+      type: 'objectId',
+      nullable: false,
+    },
+    name: {
+      type: 'string',
+      nullable: false,
+    },
+    email: {
+      type: 'string',
+      nullable: false,
+    },
+    phone: {
+      type: 'string',
+      nullable: false,
+    },
+    createdAt: {
+      type: 'timestamp',
+      createDate: true,
+    },
+    updatedAt: {
+      type: 'timestamp',
+      updateDate: true,
+    },
   },
-  name: {
-    type: String,
-    required: [true, "Please add the contact name"]
-  },
-  email: {
-    type: String,
-    required: [true, "Please add the contact email address"]
-  },
-  phone: {
-    type: String,
-    required: [true, "Please add the contact phone number"]
-  }
-}, {
-  timestamps: true
+  relations: {},
 });
-
-const Contact = mongoose.model('Contact', contactSchema);
-
-module.exports = Contact;
