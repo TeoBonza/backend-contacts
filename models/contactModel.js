@@ -30,13 +30,13 @@ module.exports = new EntitySchema({
   name: 'Contact',
   tableName: 'contacts',
   columns: {
-    _id: {
+    id: {
       primary: true,
       type: 'objectId',
       objectId: true,
       generated: true,
     },
-    user_id: {
+    userId: {
       type: 'objectId',
       nullable: false,
     },

@@ -9,7 +9,7 @@ const { ObjectId } = require('mongodb');
 const getContacts = asyncHandler(async (req, res) => {
   const contactRepository = AppDataSource.getMongoRepository(Contact);
   const contacts = await contactRepository.find({
-    where: { user_id: new ObjectId(req.user.id) },
+    where: { userId: new ObjectId(req.user.id) },
   });
   res.status(200).json(contacts);
 });
@@ -29,7 +29,7 @@ const createContacts = asyncHandler(async (req, res) => {
     name,
     email,
     phone,
-    user_id: new ObjectId(req.user.id),
+    userId: new ObjectId(req.user.id),
   });
 
   const contact = await contactRepository.save(newContact);
@@ -67,7 +67,7 @@ const updateContact = asyncHandler(async (req, res) => {
     throw new Error('Contact not found');
   };
 
-  if (contact.user_id.toString() !== req.user.id) {
+  if (contact.userId.toString() !== req.user.id) {
     res.status(403);
     throw new Error('User does not have permission to update other user contacts');
   };
@@ -92,12 +92,12 @@ const deleteContact = asyncHandler(async (req, res) => {
     throw new Error('Contact not found');
   };
 
-  if (contact.user_id.toString() !== req.user.id) {
+  if (contact.userId.toString() !== req.user.id) {
     res.status(403);
     throw new Error('User does not have permission to delete other user contacts');
   };
 
-  await contactRepository.delete(contact._id);
+  await contactRepository.remove(contact);
   res.status(200).json(contact);
 });
 
