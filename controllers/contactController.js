@@ -1,11 +1,16 @@
 const asyncHandler = require('express-async-handler');
 const Contact = require('../models/contactModel');
+const AppDataSource = require('../dataSource');
+const { ObjectId } = require('mongodb');
 
 //@desc Get all contacts
 //@route GET /api/contacts
 //@access Private
 const getContacts = asyncHandler(async (req, res) => {
-  const contacts = await Contact.find({ user_id: req.user.id });
+  const contactRepository = AppDataSource.getMongoRepository(Contact);
+  const contacts = await contactRepository.find({
+    where: { userId: new ObjectId(req.user.id) },
+  });
   res.status(200).json(contacts);
 });
 
@@ -19,21 +24,26 @@ const createContacts = asyncHandler(async (req, res) => {
     return res.status(400).send({ message: 'Fields are mandatory' });
   };
 
-  const contact = await Contact.create({
+  const contactRepository = AppDataSource.getMongoRepository(Contact);
+  const newContact = contactRepository.create({
     name,
     email,
     phone,
-    user_id: req.user.id,
+    userId: new ObjectId(req.user.id),
   });
 
+  const contact = await contactRepository.save(newContact);
   res.status(201).json(contact);
 });
 
-//@desc Get contact
+//@desc Get contact by ID
 //@route GET /api/contacts/:id
 //@access Private
 const getContact = asyncHandler(async (req, res) => {
-  const contact = await Contact.findById(req.params.id);
+  const contactRepository = AppDataSource.getMongoRepository(Contact);
+  const contact = await contactRepository.findOneBy({
+    _id: new ObjectId(req.params.id),
+  });
 
   if (!contact) {
     res.status(404);
@@ -47,21 +57,23 @@ const getContact = asyncHandler(async (req, res) => {
 //@route PUT /api/contacts/:id
 //@access Private
 const updateContact = asyncHandler(async (req, res) => {
-  const contact = await Contact.findById(req.params.id);
+  const contactRepository = AppDataSource.getMongoRepository(Contact);
+  const contact = await contactRepository.findOneBy({
+    _id: new ObjectId(req.params.id),
+  });
 
   if (!contact) {
     res.status(404);
     throw new Error('Contact not found');
   };
 
-  if (contact.user_id.toString() !== req.user.id) {
+  if (contact.userId.toString() !== req.user.id) {
     res.status(403);
     throw new Error('User does not have permission to update other user contacts');
   };
 
-  const updatedContact = await Contact.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
+  contactRepository.merge(contact, req.body);
+  const updatedContact = await contactRepository.save(contact);
 
   res.status(200).json(updatedContact);
 });
@@ -70,22 +82,24 @@ const updateContact = asyncHandler(async (req, res) => {
 //@route DELETE /api/contacts/:id
 //@access Private
 const deleteContact = asyncHandler(async (req, res) => {
-  const contact = await Contact.findById(req.params.id);
+  const contactRepository = AppDataSource.getMongoRepository(Contact);
+  const contact = await contactRepository.findOneBy({
+    _id: new ObjectId(req.params.id),
+  });
 
   if (!contact) {
     res.status(404);
     throw new Error('Contact not found');
   };
 
-  if (contact.user_id.toString() !== req.user.id) {
+  if (contact.userId.toString() !== req.user.id) {
     res.status(403);
     throw new Error('User does not have permission to delete other user contacts');
   };
 
-  await Contact.deleteOne({ _id: req.params.id });
+  await contactRepository.remove(contact);
   res.status(200).json(contact);
 });
-
 
 module.exports = {
   getContacts,

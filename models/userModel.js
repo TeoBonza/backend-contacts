@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const { EntitySchema } = require('typeorm');
 
 /**
  * @swagger
@@ -23,24 +23,37 @@ const mongoose = require('mongoose');
  *         password: secret123
  */
 
-const userSchema = mongoose.Schema({
-  username: {
-    type: String,
-    required: [true, "Please add the user name"]
+module.exports = new EntitySchema({
+  name: 'User',
+  tableName: 'users',
+  columns: {
+    id: {
+      primary: true,
+      type: 'objectId',
+      objectId: true,
+      generated: true,
+    },
+    username: {
+      type: 'string',
+      nullable: false,
+    },
+    email: {
+      type: 'string',
+      unique: true,
+      nullable: false,
+    },
+    password: {
+      type: 'string',
+      nullable: false,
+    },
+    createdAt: {
+      type: 'timestamp',
+      createDate: true,
+    },
+    updatedAt: {
+      type: 'timestamp',
+      updateDate: true,
+    },
   },
-  email: {
-    type: String,
-    required: [true, "Please add the user email address"],
-    unique: [true, "Email address already taken"]
-  },
-  password: {
-    type: String,
-    required: [true, "Please add the user password"]
-  }
-}, {
-  timestamps: true
+  relations: {},
 });
-
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
