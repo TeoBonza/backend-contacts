@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  # creationTimestamp: null
   labels:
     app: express-project
   name: express-project
@@ -13,7 +12,6 @@ spec:
   strategy: {}
   template:
     metadata:
-      # creationTimestamp: null
       labels:
         app: express-project
     spec:
@@ -21,6 +19,6 @@ spec:
       - image: express-project:latest
         name: express-project
         ports:
-          - containerPort: 5001
+          - containerPort: 5002
         resources: {}
 status: {}
