@@ -1,0 +1,4 @@
+PORT=5001
+CONNECTION_STRING=
+ACCESS_TOKEN_SECRET=
+DATABASE_CONNECTION_OPTIONS={"type":"mongodb","host":"localhost","port":27017,"username":"matteo_db_user","password":"matteo_db_password","database":"mycontacts-backend","authSource":"admin","logging":false}

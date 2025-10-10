@@ -3,12 +3,35 @@ services:
   api:
     build: .
     ports:
-      - "5001:5001"
+      - "5002:5002"
     environment:
-      - PORT=5001
+      - PORT=5002
       - REDIS_URL=redis://redis:6379
+      - DATABASE_CONNECTION_OPTIONS={"type":"mongodb","host":"mongo","port":27017,"username":"matteo_db_user","password":"matteo_db_password","database":"mycontacts-backend","authSource":"admin","logging":false}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    expose:
+      - "5002"
+    networks:
+      - net
     depends_on:
+      - mongo
       - redis
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_volume_data:/data/db
+    networks:
+      - net
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=matteo_db_user
+      - MONGO_INITDB_ROOT_PASSWORD=matteo_db_password
+      - MONGO_INITDB_DATABASE=mycontacts-backend
 
   redis:
     image: redis:latest
@@ -17,8 +40,15 @@ services:
       - redis_volume_data:/data
     ports:
       - "6379:6379"
+    networks:
+      - net
     expose:
       - "6379"
 
 volumes:
   redis_volume_data:
+  mongo_volume_data:
+
+networks:
+  net:
+    driver: bridge
