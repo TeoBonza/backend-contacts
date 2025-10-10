@@ -1,0 +1,36 @@
+services:
+  # API
+  - type: web
+    name: backend-contacts
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 5002
+      - key: ACCESS_TOKEN_SECRET
+        generateValue: true
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: backend-contacts-redis
+          property: connectionString
+      - key: CONNECTION_STRING
+        fromDatabase:
+          name: backend-contacts-db
+          property: connectionString
+      - key: DATABASE_CONNECTION_OPTIONS
+        sync: false
+
+  # Redis
+  - type: redis
+    name: backend-contacts-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
+
+# MongoDB Database
+databases:
+  - name: backend-contacts-db
+    plan: free
+    databaseName: mycontacts-backend
+    user: matteo_db_user
