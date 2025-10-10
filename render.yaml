@@ -27,10 +27,3 @@ services:
     plan: free
     maxmemoryPolicy: allkeys-lru
     ipAllowList: []
-
-# MongoDB Database
-databases:
-  - name: backend-contacts-db
-    plan: free
-    databaseName: mycontacts-backend
-    user: matteo_db_user
