@@ -7,7 +7,7 @@ services:
     environment:
       - PORT=5002
       - REDIS_URL=redis://redis:6379
-      - DATABASE_CONNECTION_OPTIONS={"type":"mongodb","host":"mongo","port":27017,"username":"matteo_db_user","password":"XZnIjkcH4hEjSnhX","database":"mycontacts-backend","authSource":"admin","logging":false}
+      - DATABASE_CONNECTION_OPTIONS={"type":"mongodb","host":"mongo","port":27017,"username":"matteo_db_user","password":"matteo_db_password","database":"mycontacts-backend","authSource":"admin","logging":false}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     expose:
@@ -30,7 +30,7 @@ services:
       - net
     environment:
       - MONGO_INITDB_ROOT_USERNAME=matteo_db_user
-      - MONGO_INITDB_ROOT_PASSWORD=XZnIjkcH4hEjSnhX
+      - MONGO_INITDB_ROOT_PASSWORD=matteo_db_password
       - MONGO_INITDB_DATABASE=mycontacts-backend
 
   redis:
