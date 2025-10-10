@@ -2,22 +2,22 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: express-project
-  name: express-project
+    app: backend-contacts-1
+  name: backend-contacts-1
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: express-project
+      app: backend-contacts-1
   strategy: {}
   template:
     metadata:
       labels:
-        app: express-project
+        app: backend-contacts-1
     spec:
       containers:
-      - image: express-project:latest
-        name: express-project
+      - image: teobonza/backend-contacts:1.0
+        name: backend-contacts
         ports:
           - containerPort: 5002
         resources: {}
