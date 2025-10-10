@@ -1,4 +1,4 @@
 PORT=5001
 CONNECTION_STRING=
 ACCESS_TOKEN_SECRET=
-DATABASE_CONNECTION_OPTIONS=
+DATABASE_CONNECTION_OPTIONS={"type":"","host":"","port":,"username":"","password":"","database":"","authSource":"","logging":}
