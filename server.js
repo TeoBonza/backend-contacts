@@ -1,8 +1,6 @@
 const express = require('express');
 const errorhandler = require('./middleware/errorHandler');
 const setupSwagger = require('./swagger');
-const options = require('./swagger');
-const dotenv = require('dotenv').config();
 const rateLimiter = require('./middleware/rate-limiter');
 const AppDataSource = require("./dataSource");
 
