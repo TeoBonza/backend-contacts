@@ -1,5 +1,8 @@
 .PHONY: up down db-only stop-db
 
+get-env-variables:
+	cp .env .env.sample
+
 up:
 	docker-compose up --build
 
