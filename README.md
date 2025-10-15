@@ -30,7 +30,7 @@ This project is a Node.js/Express REST API for managing personal contacts. It pr
 npm install
 
 2. **Set environment variables:**
-- Copy `.env.example` to `.env` and fill in required settings (e.g., CONNECTION_STRING, ACCESS_TOKEN_SECRET).
+Launch command `make get-env-variables` to copy env variables and get `.env.sample` file, rename the file deleting `.sample` to have normal env file
 
 3. **Start MongoDB and Redis (via Docker):**
 make secondary-only
