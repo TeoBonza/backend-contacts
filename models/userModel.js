@@ -11,6 +11,9 @@ const { EntitySchema } = require('typeorm');
  *         - email
  *         - password
  *       properties:
+ *         id:
+ *           type: integer
+ *           description: User ID
  *         username:
  *           type: string
  *         email:
@@ -18,6 +21,7 @@ const { EntitySchema } = require('typeorm');
  *         password:
  *           type: string
  *       example:
+ *         id: 1
  *         username: johndoe
  *         email: john@example.com
  *         password: secret123
@@ -29,29 +33,33 @@ module.exports = new EntitySchema({
   columns: {
     id: {
       primary: true,
-      type: 'objectId',
-      objectId: true,
+      type: 'integer',
       generated: true,
+      generationStrategy: 'increment',
     },
     username: {
-      type: 'string',
+      type: 'varchar',
+      length: 255,
       nullable: false,
     },
     email: {
-      type: 'string',
+      type: 'varchar',
+      length: 255,
       unique: true,
       nullable: false,
     },
     password: {
-      type: 'string',
+      type: 'varchar',
       nullable: false,
     },
     createdAt: {
       type: 'timestamp',
+      default: () => 'CURRENT_TIMESTAMP',
       createDate: true,
     },
     updatedAt: {
       type: 'timestamp',
+      default: () => 'CURRENT_TIMESTAMP',
       updateDate: true,
     },
   },

@@ -11,6 +11,9 @@ const { EntitySchema } = require('typeorm');
  *         - email
  *         - phone
  *       properties:
+ *         id:
+ *           type: integer
+ *           description: Contact ID
  *         name:
  *           type: string
  *           description: Contact name
@@ -20,10 +23,15 @@ const { EntitySchema } = require('typeorm');
  *         phone:
  *           type: string
  *           description: Contact phone number
+ *         userId:
+ *           type: integer
+ *           description: User ID who owns the contact
  *       example:
+ *         id: 1
  *         name: John Doe
  *         email: john@example.com
  *         phone: '+1-202-555-0152'
+ *         userId: 1
  */
 
 module.exports = new EntitySchema({
@@ -32,32 +40,37 @@ module.exports = new EntitySchema({
   columns: {
     id: {
       primary: true,
-      type: 'objectId',
-      objectId: true,
+      type: 'integer',
       generated: true,
+      generationStrategy: 'increment',
     },
     userId: {
-      type: 'objectId',
+      type: 'integer',
       nullable: false,
     },
     name: {
-      type: 'string',
+      type: 'varchar',
+      length: 255,
       nullable: false,
     },
     email: {
-      type: 'string',
+      type: 'varchar',
+      length: 255,
       nullable: false,
     },
     phone: {
-      type: 'string',
+      type: 'varchar',
+      length: 20,
       nullable: false,
     },
     createdAt: {
       type: 'timestamp',
+      default: () => 'CURRENT_TIMESTAMP',
       createDate: true,
     },
     updatedAt: {
       type: 'timestamp',
+      default: () => 'CURRENT_TIMESTAMP',
       updateDate: true,
     },
   },

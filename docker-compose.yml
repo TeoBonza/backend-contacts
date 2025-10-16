@@ -6,8 +6,9 @@ services:
       - "5002:5002"
     environment:
       - PORT=5002
+      - ACCESS_TOKEN_SECRET=matteo123
       - REDIS_URL=redis://redis:6379
-      - DATABASE_CONNECTION_OPTIONS={"type":"mongodb","host":"mongo","port":27017,"username":"matteo_db_user","password":"matteo_db_password","database":"mycontacts-backend","authSource":"admin","logging":false}
+      - DATABASE_CONNECTION_OPTIONS={"type":"postgres","host":"postgres","port":5432,"username":"postgres","password":"matteo_db_password","database":"mycontacts-backend","logging":false}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     expose:
@@ -15,26 +16,34 @@ services:
     networks:
       - net
     depends_on:
-      - mongo
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
-  mongo:
-    image: mongo:latest
-    container_name: mongo
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
     restart: always
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - mongo_volume_data:/data/db
+      - postgres_volume_data:/var/lib/postgresql/data
     networks:
       - net
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=matteo_db_user
-      - MONGO_INITDB_ROOT_PASSWORD=matteo_db_password
-      - MONGO_INITDB_DATABASE=mycontacts-backend
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=matteo_db_password
+      - POSTGRES_DB=mycontacts-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
-    image: redis:latest
+    image: redis:7-alpine
+    container_name: redis
     restart: always
     volumes:
       - redis_volume_data:/data
@@ -47,7 +56,7 @@ services:
 
 volumes:
   redis_volume_data:
-  mongo_volume_data:
+  postgres_volume_data:
 
 networks:
   net:

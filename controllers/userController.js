@@ -16,8 +16,8 @@ const registerUser = asyncHandler(async (req, res) => {
   };
 
   // Check if user already exists
-  const userRepository = AppDataSource.getMongoRepository(User);
-  const userExists = await userRepository.findOne({ email });
+  const userRepository = AppDataSource.getRepository(User);
+  const userExists = await userRepository.findOne({ where: { email } });
   if (userExists) {
     res.status(400);
     throw new Error('User already registered');
@@ -35,7 +35,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const user = await userRepository.save(newUser);
 
   if (user) {
-    res.status(201).json({ _id: user.id, email: user.email });
+    res.status(201).json({ id: user.id, email: user.email });
   } else {
     res.status(400);
     throw new Error('User data is not valid');
@@ -54,7 +54,7 @@ const loginUser = asyncHandler(async (req, res) => {
   };
 
   // Check if user exists
-  const userRepository = AppDataSource.getMongoRepository(User);
+  const userRepository = AppDataSource.getRepository(User);
   const user = await userRepository.findOneBy({ email });
 
   if (!user) {
@@ -69,7 +69,7 @@ const loginUser = asyncHandler(async (req, res) => {
       user: {
         username: user.username,
         email: user.email,
-        id: user.id.toString(),
+        id: user.id,
       },
     }, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: '15m',
