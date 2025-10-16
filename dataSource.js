@@ -6,6 +6,9 @@ const config = JSON.parse(process.env.DATABASE_CONNECTION_OPTIONS);
 
 const AppDataSource = new DataSource({
   ...config,
+  authSource: 'admin',
+  synchronize: true,
+  useUnifiedTopology: true,
   entities: [Contact, User],
 });
 
