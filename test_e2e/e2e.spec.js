@@ -1,38 +1,21 @@
 const request = require('supertest');
 const { expect, describe, afterAll, beforeAll, it } = require('@jest/globals');
-const { DataSource } = require('typeorm');
 const express = require('express');
 const errorhandler = require('../middleware/errorHandler');
-const Contact = require('./testContactModel');
-const User = require('./testUserModel');
-require('dotenv').config();
-
-let testDataSource;
-
-const initializeTestDatabase = async () => {
-  testDataSource = new DataSource({
-    type: 'sqlite',
-    database: ':memory:',
-    entities: [Contact, User],
-    synchronize: true,
-    logging: false,
-  });
-
-  if (!testDataSource.isInitialized) {
-    await testDataSource.initialize();
-  }
-
-  return testDataSource;
-};
+const AppDataSource = require('../dataSource');
 
 const createApp = () => {
   const app = express();
   app.use(express.json());
+  app.use('/api/contacts', require('../routes/contactRoutes'));
+  app.use('/api/users', require('../routes/userRoutes'));
+  app.use(errorhandler);
   return app;
 };
 
 describe('Application E2E Tests', () => {
   let app;
+  let testDataSource;
   let accessToken;
   let userId;
   let contactId;
@@ -51,18 +34,13 @@ describe('Application E2E Tests', () => {
 
   beforeAll(async () => {
     try {
-      await initializeTestDatabase();
-
-      const AppDataSource = require('../dataSource');
-      AppDataSource.getRepository = testDataSource.getRepository.bind(testDataSource);
-      AppDataSource.initialize = async () => testDataSource;
-      AppDataSource.isInitialized = true;
+      if (!AppDataSource.isInitialized) {
+        testDataSource = await AppDataSource.initialize();
+      } else {
+        testDataSource = AppDataSource;
+      }
 
       app = createApp();
-      app.use(express.json());
-      app.use('/api/contacts', require('../routes/contactRoutes'));
-      app.use('/api/users', require('../routes/userRoutes'));
-      app.use(errorhandler);
     } catch (error) {
       console.error('Error during test setup:', error);
       throw error;
