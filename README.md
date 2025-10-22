@@ -1,6 +1,6 @@
 # Contacts Backend API
 
-This project is a Node.js/Express REST API for managing personal contacts. It provides user authentication and CRUD operations for contacts, using MongoDB (via TypeORM) for persistent storage. The app includes security middleware, error handling, rate limiting, and Swagger documentation.
+This project is a Node.js/Express REST API for managing personal contacts. It provides user authentication and CRUD operations for contacts, using Postgres (via TypeORM) for persistent storage. The app includes security middleware, error handling, rate limiting, and Swagger documentation.
 
 ## Features
 
@@ -32,10 +32,10 @@ npm install
 2. **Set environment variables:**
 Launch command `make get-env-variables` to generate a ready `.env` file from `.env.sample` file
 
-3. **Start MongoDB and Redis (via Docker):**
+3. **Start Postgres and Redis (via Docker):**
 make secondary-only
 
-This will launch only the MongoDB database and Redis services for local development.
+This will launch only the Postgres database and Redis services for local development.
 
 4. **Run the server:**
 npm run dev
