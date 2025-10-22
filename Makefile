@@ -10,7 +10,7 @@ down:
 	docker-compose down
 
 secondary-only:
-	docker-compose up -d mongo redis
+	docker-compose up -d postgres redis
 
 stop-secondary:
-	docker-compose stop mongo redis
+	docker-compose stop postgres redis
