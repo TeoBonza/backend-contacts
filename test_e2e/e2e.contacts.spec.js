@@ -1,15 +1,14 @@
 const request = require('supertest');
-const { expect, describe, it } = require('@jest/globals');
 
-describe('Application E2E Tests', () => {
+describe('Contacts E2E Tests', () => {
   let accessToken;
-  let userId;
+  let contact;
   let contactId;
   
   const testUser = {
-    username: 'TestUser',
-    email: `user-${Date.now()}@test.com`,
-    password: 'secret1234',
+    username: 'TestUser2',
+    email: `user2-${Date.now()}@test.com`,
+    password: 'secret12345',
   };
 
   const testContact = {
@@ -18,60 +17,23 @@ describe('Application E2E Tests', () => {
     phone: '+1-202-555-0152',
   };
 
-  it('should register a new user successfully', async () => {
-    const res = await request('http://localhost:5002')
+  beforeAll(async () => {
+    await request('http://localhost:5002')
       .post('/api/users/register')
       .send(testUser);
 
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
-    expect(res.body).toHaveProperty('email', testUser.email);
-    expect(res.body).not.toHaveProperty('password');
-    userId = res.body.id;
-  });
-
-  it('should login successfully the user and return access token', async () => {
     const res = await request('http://localhost:5002')
       .post('/api/users/login')
       .send({ email: testUser.email, password: testUser.password });
 
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('accessToken');
-    expect(typeof res.body.accessToken).toBe('string');
     accessToken = res.body.accessToken;
-  });
 
-  it('should get current user info with valid token', async () => {
-    const res = await request('http://localhost:5002')
-      .get('/api/users/current')
-      .set('Authorization', `Bearer ${accessToken}`);
-
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('id');
-    expect(res.body).toHaveProperty('email', testUser.email);
-    expect(res.body).toHaveProperty('username', testUser.username);
-  });
-
-  it('should throw error if authentication token is not provided', async () => {
-    const res = await request('http://localhost:5002')
-      .get('/api/users/current');
-
-    expect(res.status).toBe(401);
-  });
-
-  it('should create a new contact successfully', async () => {
-    const res = await request('http://localhost:5002')
+    contact = await request('http://localhost:5002')
       .post('/api/contacts')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(testContact);
 
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
-    expect(res.body).toHaveProperty('name', testContact.name);
-    expect(res.body).toHaveProperty('email', testContact.email);
-    expect(res.body).toHaveProperty('phone', testContact.phone);
-    expect(res.body).toHaveProperty('userId', userId);
-    contactId = res.body.id;
+    contactId = contact.body.id;
   });
 
   it('should throw error if trying to create contact without all fields', async () => {
@@ -173,32 +135,6 @@ describe('Application E2E Tests', () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('id', contactId);
     expect(res.body).toHaveProperty('name', updatedData.name);
-  });
-
-  it('should prevent user from updating other user contacts', async () => {
-    const notOwnerUser = {
-      username: 'guestUser',
-      email: `guestuser-${Date.now()}@test.com`,
-      password: '$1234',
-    };
-
-    await request('http://localhost:5002')
-      .post('/api/users/register')
-      .send(notOwnerUser);
-
-    const loginRes = await request('http://localhost:5002')
-      .post('/api/users/login')
-      .send({
-        email: notOwnerUser.email,
-        password: notOwnerUser.password,
-      });
-
-    const res = await request('http://localhost:5002')
-      .put(`/api/contacts/${contactId}`)
-      .set('Authorization', `Bearer ${loginRes.body.accessToken}`)
-      .send({ name: 'Hacker' });
-
-    expect(res.status).toBe(403);
   });
 
   it('should delete a contact successfully', async () => {

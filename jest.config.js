@@ -13,4 +13,5 @@ module.exports = {
   clearMocks: true,
   resetMocks: true,
   setupFiles: ['<rootDir>/jest.setup.js'],
+  injectGlobals: true,
 };
