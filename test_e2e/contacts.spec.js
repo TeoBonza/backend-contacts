@@ -4,7 +4,9 @@ describe('Contacts E2E Tests', () => {
   let accessToken;
   let contact;
   let contactId;
-  
+
+  const appUrl = 'http://localhost:5002';
+
   const testUser = {
     username: 'TestUser2',
     email: `user2-${Date.now()}@test.com`,
@@ -18,17 +20,17 @@ describe('Contacts E2E Tests', () => {
   };
 
   beforeAll(async () => {
-    await request('http://localhost:5002')
+    await request(appUrl)
       .post('/api/users/register')
       .send(testUser);
 
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .post('/api/users/login')
       .send({ email: testUser.email, password: testUser.password });
 
     accessToken = res.body.accessToken;
 
-    contact = await request('http://localhost:5002')
+    contact = await request(appUrl)
       .post('/api/contacts')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(testContact);
@@ -37,7 +39,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should throw error if trying to create contact without all fields', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .post('/api/contacts')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
@@ -51,7 +53,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should throw error when creating contact without authentication', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .post('/api/contacts')
       .send(testContact);
 
@@ -59,7 +61,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should get all contacts for authenticated user', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .get('/api/contacts')
       .set('Authorization', `Bearer ${accessToken}`);
 
@@ -69,7 +71,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should throw error if no token is provided', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .get('/api/contacts');
 
     expect(res.status).toBe(401);
@@ -82,18 +84,18 @@ describe('Contacts E2E Tests', () => {
       password: 'secretWord',
     };
 
-    await request('http://localhost:5002')
+    await request(appUrl)
       .post('/api/users/register')
       .send(newUser);
 
-    const loginRes = await request('http://localhost:5002')
+    const loginRes = await request(appUrl)
       .post('/api/users/login')
       .send({
         email: newUser.email,
         password: newUser.password,
       });
 
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .get('/api/contacts')
       .set('Authorization', `Bearer ${loginRes.body.accessToken}`);
 
@@ -103,7 +105,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should get a contact by ID', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .get(`/api/contacts/${contactId}`)
       .set('Authorization', `Bearer ${accessToken}`);
 
@@ -115,7 +117,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should throw error if contact not exist', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .get('/api/contacts/100')
       .set('Authorization', `Bearer ${accessToken}`);
 
@@ -127,7 +129,7 @@ describe('Contacts E2E Tests', () => {
       name: 'New John Doe',
     };
 
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .put(`/api/contacts/${contactId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .send(updatedData);
@@ -138,7 +140,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should delete a contact successfully', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .delete(`/api/contacts/${contactId}`)
       .set('Authorization', `Bearer ${accessToken}`);
 
@@ -146,7 +148,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should verify contact is deleted', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .get(`/api/contacts/${contactId}`)
       .set('Authorization', `Bearer ${accessToken}`);
 
@@ -154,7 +156,7 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should throw error if trying to delete contact that does not exist', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .delete('/api/contacts/20')
       .set('Authorization', `Bearer ${accessToken}`);
 

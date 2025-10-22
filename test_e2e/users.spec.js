@@ -2,6 +2,8 @@ const request = require('supertest');
 
 describe('Users E2E Tests', () => {
   let accessToken;
+
+  const appUrl = 'http://localhost:5002';
   
   const testUser = {
     username: 'TestUser',
@@ -10,7 +12,7 @@ describe('Users E2E Tests', () => {
   };
 
   it('should register a new user successfully', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .post('/api/users/register')
       .send(testUser);
 
@@ -18,11 +20,10 @@ describe('Users E2E Tests', () => {
     expect(res.body).toHaveProperty('id');
     expect(res.body).toHaveProperty('email', testUser.email);
     expect(res.body).not.toHaveProperty('password');
-    userId = res.body.id;
   });
 
   it('should login successfully the user and return access token', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .post('/api/users/login')
       .send({ email: testUser.email, password: testUser.password });
 
@@ -33,7 +34,7 @@ describe('Users E2E Tests', () => {
   });
 
   it('should get current user info with valid token', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .get('/api/users/current')
       .set('Authorization', `Bearer ${accessToken}`);
 
@@ -44,7 +45,7 @@ describe('Users E2E Tests', () => {
   });
 
   it('should throw error if authentication token is not provided', async () => {
-    const res = await request('http://localhost:5002')
+    const res = await request(appUrl)
       .get('/api/users/current');
 
     expect(res.status).toBe(401);
