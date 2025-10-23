@@ -1,17 +1,14 @@
 const request = require('supertest');
+const { constants } = require('../constants');
+const { getAccessToken, createTestUser } = require('./helper');
 
 describe('Contacts E2E Tests', () => {
   let accessToken;
   let contact;
   let contactId;
 
-  const appUrl = 'http://localhost:5002';
-
-  const testUser = {
-    username: 'TestUser2',
-    email: `user2-${Date.now()}@test.com`,
-    password: 'secret12345',
-  };
+  const appUrl = constants.appUrl;
+  const testUser = createTestUser('TestUser2');
 
   const testContact = {
     name: 'John Doe',
@@ -20,15 +17,7 @@ describe('Contacts E2E Tests', () => {
   };
 
   beforeAll(async () => {
-    await request(appUrl)
-      .post('/api/users/register')
-      .send(testUser);
-
-    const res = await request(appUrl)
-      .post('/api/users/login')
-      .send({ email: testUser.email, password: testUser.password });
-
-    accessToken = res.body.accessToken;
+    accessToken = await getAccessToken(testUser);
 
     contact = await request(appUrl)
       .post('/api/contacts')
@@ -78,26 +67,12 @@ describe('Contacts E2E Tests', () => {
   });
 
   it('should return empty array if user has no contacts', async () => {
-    const newUser = {
-      username: 'User',
-      email: `userNew-${Date.now()}@email.com`,
-      password: 'secretWord',
-    };
-
-    await request(appUrl)
-      .post('/api/users/register')
-      .send(newUser);
-
-    const loginRes = await request(appUrl)
-      .post('/api/users/login')
-      .send({
-        email: newUser.email,
-        password: newUser.password,
-      });
+    const newUser = createTestUser('userNew');
+    const userToken = await getAccessToken(newUser);
 
     const res = await request(appUrl)
       .get('/api/contacts')
-      .set('Authorization', `Bearer ${loginRes.body.accessToken}`);
+      .set('Authorization', `Bearer ${userToken}`);
 
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);

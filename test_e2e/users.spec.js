@@ -1,15 +1,11 @@
 const request = require('supertest');
+const { constants } = require('../constants');
+const { createTestUser } = require('./helper');
 
 describe('Users E2E Tests', () => {
   let accessToken;
-
-  const appUrl = 'http://localhost:5002';
-  
-  const testUser = {
-    username: 'TestUser',
-    email: `user-${Date.now()}@test.com`,
-    password: 'secret1234',
-  };
+  const appUrl = constants.appUrl;
+  const testUser = createTestUser();
 
   it('should register a new user successfully', async () => {
     const res = await request(appUrl)
