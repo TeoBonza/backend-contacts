@@ -15,15 +15,6 @@ async function getAccessToken(userData) {
   return loginRes.body.accessToken;
 }
 
-function createTestUser(user = 'user') {
-  return {
-    username: `TestUser_${user}`,
-    email: `${user}-${Date.now()}@test.com`,
-    password: 'secret12345',
-  };
-}
-
 module.exports = {
   getAccessToken,
-  createTestUser,
 };

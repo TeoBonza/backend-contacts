@@ -1,14 +1,16 @@
 const request = require('supertest');
 const { constants } = require('../constants');
-const { createTestUser } = require('./helper');
 
 describe('Users E2E Tests', () => {
   let accessToken;
-  const appUrl = constants.appUrl;
-  const testUser = createTestUser();
+  const testUser = {
+    username: 'TestUser',
+    email: `testuser-${Date.now()}@example.com`,
+    password: 'secret12345',
+  };
 
   it('should register a new user successfully', async () => {
-    const res = await request(appUrl)
+    const res = await request(constants.appUrl)
       .post('/api/users/register')
       .send(testUser);
 
@@ -19,7 +21,7 @@ describe('Users E2E Tests', () => {
   });
 
   it('should login successfully the user and return access token', async () => {
-    const res = await request(appUrl)
+    const res = await request(constants.appUrl)
       .post('/api/users/login')
       .send({ email: testUser.email, password: testUser.password });
 
@@ -30,7 +32,7 @@ describe('Users E2E Tests', () => {
   });
 
   it('should get current user info with valid token', async () => {
-    const res = await request(appUrl)
+    const res = await request(constants.appUrl)
       .get('/api/users/current')
       .set('Authorization', `Bearer ${accessToken}`);
 
@@ -41,7 +43,7 @@ describe('Users E2E Tests', () => {
   });
 
   it('should throw error if authentication token is not provided', async () => {
-    const res = await request(appUrl)
+    const res = await request(constants.appUrl)
       .get('/api/users/current');
 
     expect(res.status).toBe(401);
